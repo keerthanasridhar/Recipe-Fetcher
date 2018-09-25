@@ -25,6 +25,8 @@ export const clearInput = () => {
 
 export const clearResults = () => {
     elements.searchResultList.innerHTML = '';
+    //Clear the paginatio button results
+    elements.searchResPages.innerHTML = '';
 }
 
 
@@ -115,7 +117,7 @@ export const renderResults = (recipes, page = 1, resPerPage = 10) => {
 
     const start = (page - 1) * resPerPage; //eg: if page =1 ,start: 0 end: 10
     const end = page * resPerPage;
-    debugger;
+    //debugger;
     recipes.slice(start, end).forEach(renderRecipe);
     renderButton(page, recipes.length, resPerPage);
 };

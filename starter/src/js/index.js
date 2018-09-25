@@ -20,6 +20,7 @@ import {
     renderLoader,
     clearLoader,
 } from './views/base'; //All the elements from the base.js
+import Recipe from './models/Recipe';
 
 /** Global state of app
  * Search object
@@ -29,6 +30,8 @@ import {
  */
 
 const state = {};
+/**------------ SEARCH CONTROLLER ----------*/
+
 
 //Function when the form is submitted
 const controlSearch = async () => {
@@ -67,11 +70,19 @@ elements.searchResPages.addEventListener('click', e => {
     const btn = e.target.closest('.btn-inline');
     if (btn) {
         const goToPage = parseInt(btn.dataset.goto, 10);
-        searchView.clearResults();
+        searchView.clearResults(); // clear the results first
 
         searchView.renderResults(state.search.result, goToPage);
-        console.log(goToPage);
+        //console.log(goToPage);
     }
 
 
 });
+
+/**------------ RECIPE CONTROLLER------------- */
+
+const r = new Recipe(47025);
+
+r.getRecipe();
+console.log(r);
+debugger;
