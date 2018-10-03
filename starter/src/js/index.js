@@ -13,14 +13,18 @@
 
 //Not all browsers allow the fetch function and so we installa axios to make it compatible with other browsers using npm
 
-import Search from './models/Search';
-import * as searchView from './views/searchView';
 import {
     elements,
     renderLoader,
     clearLoader,
 } from './views/base'; //All the elements from the base.js
+
+import * as searchView from './views/searchView';
+import * as recipeView from './views/recipeView';
+import * as listView from './views/listView';
+import Search from './models/Search';
 import Recipe from './models/Recipe';
+import List from './models/List';
 
 /** Global state of app
  * Search object
@@ -30,6 +34,7 @@ import Recipe from './models/Recipe';
  */
 
 const state = {};
+window.state = state;
 /**------------ SEARCH CONTROLLER ----------*/
 
 
@@ -46,18 +51,23 @@ const controlSearch = async () => {
 
         // 3) prepare UI for results
         searchView.clearInput();
-        searchView.clearResults(); //That is once your search you need to clear it in the searchlist
+        searchView.clearResults();
+
+        //That is once your search you need to clear it in the searchlist
         renderLoader(elements.searchRes);
 
         //4) Search for recipes
-        await state.search.getResults();
+        try {
+            await state.search.getResults();
+            //5 Render results in UI
+            //console.log(state.search.result);
 
-        //5 Render results in UI
-        //console.log(state.search.result);
-        clearLoader();
-        searchView.renderResults(state.search.result);
-
-
+            clearLoader();
+            searchView.renderResults(state.search.result);
+        } catch (error) {
+            alert('Something wrong with the search...');
+            clearLoader();
+        }
     }
 }
 //Adding an event listener
@@ -65,6 +75,7 @@ elements.SearchForm.addEventListener('submit', e => {
     e.preventDefault(); //To prevent the browser from reloading
     controlSearch();
 });
+
 
 elements.searchResPages.addEventListener('click', e => {
     const btn = e.target.closest('.btn-inline');
@@ -75,14 +86,137 @@ elements.searchResPages.addEventListener('click', e => {
         searchView.renderResults(state.search.result, goToPage);
         //console.log(goToPage);
     }
-
-
 });
 
 /**------------ RECIPE CONTROLLER------------- */
 
-const r = new Recipe(47025);
+// const r = new Recipe(16553);
+// //debugger;
+// r.getRecipe();
+// console.log(r);
 
-r.getRecipe();
-console.log(r);
-debugger;
+
+//Need to make the recipe clicked on show on the center
+//using hashchange we can get the recipe ID of all the recipes displayed from the API
+
+const controlRecipe = async () => {
+    //Get the Id from the URL
+    const id = window.location.hash.replace('#', '');
+    console.log(id);
+
+
+    if (id) {
+        //Prepare UI for changes
+        recipeView.clearRecipe();
+        renderLoader(elements.recipe);
+
+        //highlight the search item
+        if (state.search) {
+            searchView.highlightedSelected(id);
+        }
+
+
+        //create new recipe object
+        //We are taking it from the state
+        state.recipe = new Recipe(id);
+
+
+        try {
+            //get recipe Data
+            //---->calling the get from the server asynchronously
+            //Parse ingredients and get recipe
+            await state.recipe.getRecipe();
+
+            // console.log(state.recipe.Ingredients);
+            state.recipe.parseIngredients();
+            //debugger;
+
+            //Calculate servings and time
+            state.recipe.calcTime();
+            state.recipe.servingTime();
+
+
+            //render the recipe
+            //console.log(state.recipe);
+            clearLoader();
+            recipeView.renderRecipe(state.recipe);
+        } catch (err) {
+            alert('Error processing recipe!');
+        }
+
+    }
+
+};
+
+// window.addEventListener('hashchange', controlRecipe);
+
+// window.addEventListener('load', controlRecipe);
+
+// to use multiple event listener and then we use by taking it as an array and then adding an event
+
+['hashchange', 'load'].forEach(event => addEventListener(event, controlRecipe));
+
+
+/**------------ LIST CONTROLLER------------- */
+
+const controlList = () => {
+
+    //Create a new list if there isnt any
+    if (!state.list) {
+        state.list = new List();
+    }
+
+    //Add each ingredient to thelist
+    state.recipe.ingredients.forEach(el => {
+        const item = state.list.addItem(el.count, el.unit, el.ingredient);
+        listView.renderItem(item);
+    });
+}
+
+
+//Handle delete and update list item events
+elements.shopping.addEventListener('click', e => {
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+
+
+    //handle the delete button
+    if (e.target.closest('.shopping__delete, shopping__delete *')) {
+        //Delete from the state
+        state.list.deleteItem(id);
+
+        //delete from UI
+        listView.deleteItem(id);
+
+        //handling the updated event
+    } else if (e.target.matches('.shopping__count-value')) {
+        const val = parseFloat(e.target.value);
+        state.list.updateCount(id, val);
+
+    }
+
+});
+
+
+
+//handling the recipe and increase the servinsg we create an event delegation
+elements.recipe.addEventListener('click', e => {
+
+    if (e.target.closest('.btn-decrease, .btn-decrease *')) {
+        // decrease button is clicked -->settings limit
+        if (state.recipe.servings > 1) {
+            state.recipe.updateServings('dec');
+            recipeView.updateServingsIngredients(state.recipe);
+        }
+    } else if (e.target.closest('.btn-increase, .btn-increase *')) {
+        // decrease button is clicked
+
+        state.recipe.updateServings('inc');
+        recipeView.updateServingsIngredients(state.recipe);
+    } else if (e.target.closest('.recipe__btn--add, .recipe__btn--add *')) {
+        controlList();
+    }
+    //console.log(state.recipe);
+
+});
+
+window.l = new List();

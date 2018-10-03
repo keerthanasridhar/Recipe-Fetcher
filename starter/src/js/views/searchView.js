@@ -10,9 +10,7 @@
 import {
     elements
 } from './base'; //All the elements from the base.js
-import {
-    create
-} from 'domain';
+
 //debugger;
 export const getInput = () => elements.searchInput.value; //Since its a arrow function it will implicitly return a value;
 
@@ -25,10 +23,19 @@ export const clearInput = () => {
 
 export const clearResults = () => {
     elements.searchResultList.innerHTML = '';
-    //Clear the paginatio button results
+    //Clear the pagination button results
     elements.searchResPages.innerHTML = '';
 }
 
+export const highlightedSelected = id => {
+
+    const resultArr = Array.from(document.querySelectorAll('.results__link'));
+    resultArr.forEach(el => {
+        el.classList.remove('results__link--active');
+    })
+    //select all the list of elements or recipes
+    document.querySelector(`a[href = "#${id}"]`).classList.add('results__link--active');
+};
 
 //Eg: 'pasta with tomato and spinach'
 /*
@@ -61,8 +68,9 @@ const renderRecipe = recipe => {
 
 
     const markup =
-        ` <li>
-    <a class="results__link" href="${recipe.recipe_id}">
+        `<div> 
+        <li>
+    <a class="results__link" href="#${recipe.recipe_id}">
         <figure class="results__fig">
             <img src="${recipe.image_url}" alt="Test">
         </figure>
@@ -71,12 +79,18 @@ const renderRecipe = recipe => {
             <p class="results__author">${recipe.publisher}</p>
         </div>
     </a>
-</li>`;
+</li> <div>`;
     var txt = document.createElement("div")
     txt.innerHTML = markup;
 
+
     //debugger;
+    //Since we're using a insertadjacent element we put it in a dive element by crearing 
+    //the a div and then we insert it in the html and
     elements.searchResultList.insertAdjacentElement('beforeend', txt);
+
+
+    //elements.searchResultList.insertAdjacentHTML('beforeend',markup);
 
 };
 //Creation of the render pagination button 
@@ -119,5 +133,6 @@ export const renderResults = (recipes, page = 1, resPerPage = 10) => {
     const end = page * resPerPage;
     //debugger;
     recipes.slice(start, end).forEach(renderRecipe);
+    //console.log(recipes);
     renderButton(page, recipes.length, resPerPage);
 };

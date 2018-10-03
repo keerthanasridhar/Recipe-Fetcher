@@ -1,7 +1,8 @@
 // //export default 'I am an exported string.';
 
 // export default 23;
-import Axios from 'axios';
+import axios from 'axios';
+
 import {
     key,
     proxy
@@ -12,11 +13,10 @@ export default class Search {
     }
 
     //Method to search
-
     async getResults() {
         try {
-            const res = await Axios(`${proxy}/http://food2fork.com/api/search?key=${key}&q=${this.query}`);
-            //console.log(res);
+            //debugger;
+            const res = await axios(`${proxy}http://food2fork.com/api/search?key=${key}&q=${this.query}`);
             this.result = res.data.recipes; // to get all the recepis in the object
             //debugger;
             //console.log(this.result);
