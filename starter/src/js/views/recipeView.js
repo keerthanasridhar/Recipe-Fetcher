@@ -17,21 +17,23 @@ const formatCount = count => {
 
     if (count) {
 
+        const newCount = Math.round(count * 10000) / 10000;
+
 
         //to convert the string to number we use a map to check for string to number
-        const [int, dec] = count.toString().split('.').map(el => parseInt(el, 10));
+        const [int, dec] = newCount.toString().split('.').map(el => parseInt(el, 10));
 
-        if (!dec) return count;
+        if (!dec) return newCount;
 
         //debugger;
         //0.5 ---> 1/2
         if (int === 0) {
-            const fr = new Fraction(count);
+            const fr = new Fraction(newCount);
 
             return `${fr.numerator}/${fr.denominator}`;
         } //count:2.5 ---> 2 1/2 
         else {
-            const fr = new Fraction(count - int);
+            const fr = new Fraction(newCount - int);
             return `${int} ${fr.numerator}/${fr.denominator}`;
 
         }
@@ -43,7 +45,7 @@ const formatCount = count => {
 
 
 const createIngredient = ingredient => {
-    console.log(`Now this is what I call as Deeee- Whaaaaat?`);
+
     return `   
     <li class="recipe__item">
     <svg class="recipe__icon">
@@ -59,7 +61,7 @@ const createIngredient = ingredient => {
 }
 
 
-export const renderRecipe = recipe => {
+export const renderRecipe = (recipe, isLiked) => {
 
     const markup = `
 <figure class="recipe__fig">
@@ -99,7 +101,7 @@ export const renderRecipe = recipe => {
                 </div>
                 <button class="recipe__love">
                     <svg class="header__likes">
-                        <use href="img/icons.svg#icon-heart-outlined"></use>
+                        <use href="img/icons.svg#icon-heart${isLiked?'':'-outlined'}"></use>
                     </svg>
                 </button>
             </div>
