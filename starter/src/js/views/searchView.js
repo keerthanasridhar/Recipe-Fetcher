@@ -34,7 +34,7 @@ export const highlightedSelected = id => {
         el.classList.remove('results__link--active');
     })
     //select all the list of elements or recipes
-    document.querySelector(`a[href = "#${id}"]`).classList.add('results__link--active');
+    document.querySelector(`.results__link[href = "#${id}"]`).classList.add('results__link--active');
 };
 
 //Eg: 'pasta with tomato and spinach'
@@ -46,7 +46,7 @@ acc: 15/acc+ cur.length = 15+3 = 18/(18>the limit) newTitle = ['pasta','with','t
 acc: 15/acc+ cur.length = 15+ = 25/(18>the limit) newTitle = ['pasta','with','tomato'] doesnt push
 
 */
-const limitRecipeTitle = (title, limit = 20) => {
+export const limitRecipeTitle = (title, limit = 20) => {
     const newTitle = [];
     if (title.length > limit) {
         title.split(' ').reduce((acc, cur) => {
