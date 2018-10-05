@@ -1,0 +1,33 @@
+// ([{ }])
+//Balanced brackets
+//
+
+var validateString = function (str) {
+
+    if (str.length <= 1) {
+        return false;
+    }
+
+    let stack = [];
+
+    let openBrackets = ['(', '[', '{'];
+    let closeBrackets = [')', ']', '}'];
+
+    for (let i = 0; i < str.length; i++) {
+
+        ch = str[i];
+
+        if (closeBrackets.indexOf(ch) > -1) {
+            MatchingOpenBracktes = openBrackets[closeBrackets.indexOf(ch)];
+
+            if (stack.length == 0 || (stack.pop() != MatchingOpenBracktes)) {
+                return false;
+                
+            }
+        } else if (openBrackets.indexOf(ch) > -1) {
+            
+            stack.push(ch);
+        }
+    }
+    return (stack.lenght == 0);
+};

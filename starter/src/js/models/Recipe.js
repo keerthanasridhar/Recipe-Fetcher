@@ -16,7 +16,7 @@ export default class Recipe {
     async getRecipe() {
         try {
             const res = await axios(`${proxy}http://food2fork.com/api/get?key=${key}&rId=${this.id}`);
-            console.log(res)
+            // console.log(res)
             //for rate limtiting purpose we check if the recipe is present from the API then we parse the result
             //Else we
             if (res.data.recipe) {
